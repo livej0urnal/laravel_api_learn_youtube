@@ -1,58 +1,73 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<h1 align="center">Вольт — интернет-магазин на Laravel</h1>
+
+<p align="center">Учебный магазин электроники для серии о разработке REST API на канале Short Fuse in IT.</p>
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/shop-hero.webp" width="760" alt="Электроника на обложке магазина Вольт">
 </p>
 
-## About Laravel
+<p align="center">
+  <strong>Laravel 13</strong> · <strong>PHP 8.5</strong> · <strong>Blade</strong> · <strong>SQLite / MySQL</strong> · <strong>PHPUnit</strong>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Что можно попробовать
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Найти товар по названию, выбрать категорию и открыть карточку товара. В демо-каталоге **100 категорий и 500 товаров**.
+- Добавить товары в корзину, изменить количество или удалить позиции. Корзина хранится в сессии и сохраняется при входе и регистрации.
+- Оформить демо-заказ без онлайн-оплаты. Магазин сохраняет заказ и списывает остатки в одной транзакции.
+- Создать аккаунт, войти по электронной почте и паролю или выйти из аккаунта. Оформить заказ можно и без регистрации.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Запуск с SQLite
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Понадобятся Git, Composer и PHP 8.5 с расширением `pdo_sqlite`. Витрина использует Blade и CSS из `public/`, поэтому для запуска Node.js не нужен.
 
 ```bash
-composer require laravel/boost --dev
+git clone https://github.com/livej0urnal/laravel_api_learn_youtube.git
+cd laravel_api_learn_youtube
 
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+touch database/database.sqlite
+php artisan migrate
+php artisan db:seed --class=CatalogSeeder
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Откройте [localhost:8000](http://localhost:8000). Чтобы проверить вход, создайте аккаунт на странице регистрации.
 
-## Contributing
+### Запуск через MAMP PRO
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Создайте хост с корнем в папке `public/` и пустую базу MySQL. После установки зависимостей и генерации ключа укажите в `.env` значение `DB_CONNECTION=mysql`, затем заполните `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` и `DB_PASSWORD` по настройкам MAMP PRO. В `APP_URL` укажите адрес хоста.
 
-## Code of Conduct
+```bash
+php artisan migrate
+php artisan db:seed --class=CatalogSeeder
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Откройте адрес хоста MAMP PRO в браузере.
 
-## Security Vulnerabilities
+## Где искать код
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Файл | За что отвечает |
+| --- | --- |
+| [`routes/web.php`](routes/web.php) | Маршруты витрины, корзины, заказа и аккаунта |
+| [`ShopCartController.php`](app/Http/Controllers/ShopCartController.php) | Карточка товара, корзина и оформление заказа |
+| [`ShopAuthController.php`](app/Http/Controllers/ShopAuthController.php) | Регистрация, вход и выход |
+| [`resources/views/`](resources/views) | Шаблоны страниц магазина |
+| [`CatalogSeeder.php`](database/seeders/CatalogSeeder.php) | Категории и товары для демо |
+| [`tests/Feature/`](tests/Feature) | Проверки основных сценариев магазина |
 
-## License
+## Тесты
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+PHPUnit использует SQLite в памяти. Тесты проверяют регистрацию, вход, ограничение попыток входа, оформление заказа и изменение остатков.
+
+```bash
+vendor/bin/phpunit
+```
+
+## Серия на YouTube
+
+Витрина служит основой для серии о REST API на Laravel. В ней можно показать, как добавить API каталога, фильтры и пагинацию к существующему приложению, а затем перейти к защищённым запросам для работы с корзиной и заказами.
+
+[Short Fuse in IT на YouTube](https://www.youtube.com/channel/UC__PY1YqvcfmQTg_17BnBsQ)

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ShopAuthController;
 use App\Http\Controllers\ShopCartController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,17 @@ Route::get('/', function (Request $request) {
 
     return view('shop', compact('categories', 'products', 'search', 'category'));
 })->block()->name('shop');
+
+Route::middleware('guest')->group(function () {
+    Route::view('/login', 'shop-login')->block()->name('login');
+    Route::post('/login', [ShopAuthController::class, 'login'])
+        ->middleware('throttle:10,1,shop-login')->block()->name('login.store');
+    Route::view('/register', 'shop-register')->block()->name('register');
+    Route::post('/register', [ShopAuthController::class, 'register'])
+        ->middleware('throttle:5,1,shop-register')->block()->name('register.store');
+});
+
+Route::post('/logout', [ShopAuthController::class, 'logout'])->middleware('auth')->block()->name('logout');
 
 Route::get('/products/{slug}', [ShopCartController::class, 'product'])->block()->name('products.show');
 Route::get('/cart', [ShopCartController::class, 'cart'])->block()->name('cart.show');

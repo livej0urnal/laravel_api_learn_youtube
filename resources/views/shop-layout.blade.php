@@ -17,6 +17,16 @@
             <nav class="header-nav" aria-label="Магазин">
                 <a class="header-link" href="{{ route('shop') }}#catalog">Каталог</a>
                 <a class="header-link header-cart" href="{{ route('cart.show') }}">Корзина <span>{{ array_sum(session('cart.items', [])) }}</span></a>
+                @auth
+                    <span class="header-user">{{ auth()->user()->name }}</span>
+                    <form action="{{ route('logout') }}" method="post">
+                        @csrf
+                        <button class="header-link header-logout" type="submit">Выйти</button>
+                    </form>
+                @else
+                    <a class="header-link" href="{{ route('login') }}">Войти</a>
+                    <a class="header-link" href="{{ route('register') }}">Регистрация</a>
+                @endauth
             </nav>
         </div>
     </header>
