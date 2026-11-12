@@ -30,3 +30,6 @@ Thumbs.db
 /bootstrap/cache/
 /storage/app/
 /storage/framework/
+
+/AGENTS.md
+/CLAUDE.md
