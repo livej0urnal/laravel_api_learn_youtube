@@ -34,3 +34,4 @@ Route::controller(CheckoutController::class)->prefix('checkout')->name('checkout
     Route::post('/', 'store')->block()->name('place');
     Route::get('/complete', 'complete')->block()->name('complete');
 });
+
