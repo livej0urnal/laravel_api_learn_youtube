@@ -1,31 +1,13 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ShopAuthController;
-use App\Http\Controllers\ShopCartController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function (Request $request) {
-    $search = trim($request->string('q')->limit(100, '')->toString());
-    $category = trim($request->string('category')->limit(255, '')->toString());
-
-    $categories = DB::table('categories')
-        ->orderBy('name')
-        ->get(['id', 'name', 'slug']);
-
-    $products = DB::table('products')
-        ->join('categories', 'categories.id', '=', 'products.category_id')
-        ->select('products.*', 'categories.name as category_name', 'categories.slug as category_slug')
-        ->when($category !== '', fn ($query) => $query->where('categories.slug', $category))
-        ->when($search !== '', fn ($query) => $query->whereLike('products.name', "%{$search}%"))
-        ->orderBy('products.id')
-        ->paginate(12)
-        ->appends(array_filter(['q' => $search, 'category' => $category], fn ($value) => $value !== ''))
-        ->fragment('catalog');
-
-    return view('shop', compact('categories', 'products', 'search', 'category'));
-})->block()->name('shop');
+Route::get('/', [ShopController::class, 'index'])->block()->name('shop');
 
 Route::middleware('guest')->group(function () {
     Route::view('/login', 'shop-login')->block()->name('login');
@@ -38,11 +20,17 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [ShopAuthController::class, 'logout'])->middleware('auth')->block()->name('logout');
 
-Route::get('/products/{slug}', [ShopCartController::class, 'product'])->block()->name('products.show');
-Route::get('/cart', [ShopCartController::class, 'cart'])->block()->name('cart.show');
-Route::post('/cart/{product}', [ShopCartController::class, 'add'])->whereNumber('product')->block()->name('cart.add');
-Route::patch('/cart/{product}', [ShopCartController::class, 'update'])->whereNumber('product')->block()->name('cart.update');
-Route::delete('/cart/{product}', [ShopCartController::class, 'remove'])->whereNumber('product')->block()->name('cart.remove');
-Route::get('/checkout', [ShopCartController::class, 'checkout'])->block()->name('checkout.show');
-Route::post('/checkout', [ShopCartController::class, 'placeOrder'])->block()->name('checkout.place');
-Route::get('/checkout/complete', [ShopCartController::class, 'complete'])->block()->name('checkout.complete');
+Route::get('/products/{product:slug}', [ProductController::class, 'show'])->block()->name('products.show');
+
+Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', 'index')->block()->name('show');
+    Route::post('/{product}', 'store')->whereNumber('product')->block()->name('add');
+    Route::patch('/{product}', 'update')->whereNumber('product')->block()->name('update');
+    Route::delete('/{product}', 'destroy')->whereNumber('product')->block()->name('remove');
+});
+
+Route::controller(CheckoutController::class)->prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', 'show')->block()->name('show');
+    Route::post('/', 'store')->block()->name('place');
+    Route::get('/complete', 'complete')->block()->name('complete');
+});

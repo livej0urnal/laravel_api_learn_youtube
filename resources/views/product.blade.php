@@ -4,7 +4,7 @@
 
 @section('content')
     <section class="store-page">
-        <a class="back-link" href="{{ route('shop', ['category' => $product->category_slug]) }}#catalog">← {{ $product->category_name }}</a>
+        <a class="back-link" href="{{ route('shop', ['category' => $product->category->slug]) }}#catalog">← {{ $product->category->name }}</a>
 
         <div class="product-detail">
             <div>

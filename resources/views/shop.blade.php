@@ -39,7 +39,7 @@
         <div class="products">
             @forelse ($products as $product)
                 <article class="product">
-                    <a class="product-category" href="{{ route('shop', ['category' => $product->category_slug]) }}#catalog">{{ $product->category_name }}</a>
+                    <a class="product-category" href="{{ route('shop', ['category' => $product->category->slug]) }}#catalog">{{ $product->category->name }}</a>
                     <h3><a class="product-name" href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a></h3>
                     @if ($product->description)
                         <p class="product-description">{{ $product->description }}</p>

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Product;
 use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class CheckoutTest extends TestCase
@@ -15,8 +15,8 @@ class CheckoutTest extends TestCase
     {
         $this->seed(CatalogSeeder::class);
 
-        $product = DB::table('products')->where('slug', 'iphone-17-pro-256gb')->first();
-        $charger = DB::table('products')->where('slug', 'usb-c-charger-30w')->first();
+        $product = Product::query()->where('slug', 'iphone-17-pro-256gb')->firstOrFail();
+        $charger = Product::query()->where('slug', 'usb-c-charger-30w')->firstOrFail();
 
         $this->get(route('products.show', $product->slug))
             ->assertOk()
@@ -57,12 +57,12 @@ class CheckoutTest extends TestCase
     {
         $this->seed(CatalogSeeder::class);
 
-        $product = DB::table('products')->where('slug', 'iphone-17-pro-256gb')->first();
+        $product = Product::query()->where('slug', 'iphone-17-pro-256gb')->firstOrFail();
 
         $this->post(route('cart.add', $product->id), ['quantity' => 2])
             ->assertRedirectToRoute('cart.show');
 
-        DB::table('products')->where('id', $product->id)->update(['stock' => 1]);
+        $product->update(['stock' => 1]);
 
         $this->from(route('checkout.show'))
             ->post(route('checkout.place'), $this->checkoutData())
